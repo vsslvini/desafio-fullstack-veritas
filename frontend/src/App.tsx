@@ -16,7 +16,7 @@ function App() {
         setError(null);
 
         const response = await api.get<Task[]>('/tasks');
-        setTasks(response.data);
+        setTasks(response.data || []);
         setLoading(false);
       } catch (error) {
         setError("Falha ao carregar tarefas, verificar o backend.");
@@ -24,8 +24,8 @@ function App() {
       } finally {
         setLoading(false);
       }
-      fetchTasks();
     };
+    fetchTasks();
   }, []);
 
 
@@ -62,7 +62,7 @@ function App() {
       <main className="kanban-board">
         {tasks.map(task => (
           <div key={task.id}>
-            <p>{task.title} ({task.status})</p>
+            <p>{task.titulo} ({task.status})</p>
           </div>
         ))}
         {tasks.length === 0 && (

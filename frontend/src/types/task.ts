@@ -1,8 +1,8 @@
 
 export interface Task {
-  id: string;        
-  title: string;
-  description?: string; 
+  id: number;        
+  titulo: string;
+  descricao?: string; 
   status: 'A Fazer' | 'Em Progresso' | 'Concluídas';
   createdAt?: string; 
 }
