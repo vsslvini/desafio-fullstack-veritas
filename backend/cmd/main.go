@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/http"
+	"strconv"
 	"sync"
 
 	"github.com/gin-gonic/gin"
@@ -55,6 +56,43 @@ func getTasksHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, taskList)
 }
 
+func updateTaskHandler(c *gin.Context) {
+	idStr := c.Param("id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "ID inválido, precisa ser um número"})
+		return
+	}
+
+	var updatedTask Task
+	if err := c.ShouldBindJSON(&updatedTask); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Corpo da requisição (JSON) inválido"})
+		return
+	}
+
+	if updatedTask.Titulo == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "O título é obrigatório"})
+		return
+	}
+	if updatedTask.Status != "A Fazer" && updatedTask.Status != "Em Progresso" && updatedTask.Status != "Concluídas" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Status inválido. Deve ser 'A Fazer', 'Em Progresso' ou 'Concluídas'"})
+		return
+	}
+
+	tasksLock.Lock()
+	defer tasksLock.Unlock()
+
+	_, exists := tasks[id]
+	if !exists {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Tarefa não encontrada"})
+		return
+	}
+
+	updatedTask.ID = id
+	tasks[id] = updatedTask
+	c.JSON(http.StatusOK, updatedTask)
+}
+
 func main() {
 
 	server := gin.Default()
@@ -69,6 +107,7 @@ func main() {
 	{
 		api.POST("", createTaskHandler)
 		api.GET("", getTasksHandler)
+		api.PUT("/:id", updateTaskHandler)
 	}
 
 	server.Run(":8000")
