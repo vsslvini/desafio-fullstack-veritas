@@ -93,6 +93,28 @@ func updateTaskHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, updatedTask)
 }
 
+func deleteTaskHandler(c *gin.Context) {
+	idStr := c.Param("id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "ID inválido, precisa ser um número"})
+		return
+	}
+
+	tasksLock.Lock()
+	defer tasksLock.Unlock()
+
+	_, exists := tasks[id]
+	if !exists {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Tarefa não encontrada"})
+		return
+	}
+
+	delete(tasks, id)
+
+	c.Status(http.StatusNoContent)
+}
+
 func main() {
 
 	server := gin.Default()
@@ -108,6 +130,7 @@ func main() {
 		api.POST("", createTaskHandler)
 		api.GET("", getTasksHandler)
 		api.PUT("/:id", updateTaskHandler)
+		api.DELETE("/:id", deleteTaskHandler)
 	}
 
 	server.Run(":8000")
