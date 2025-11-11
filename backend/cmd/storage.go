@@ -1,4 +1,3 @@
-// backend/cmd/storage.go
 package main
 
 import (
@@ -11,9 +10,6 @@ import (
 
 const tasksFile = "tasks.json"
 
-// [!code ++]
-// 1. ADICIONADO A DEFINIÇÃO DA STRUCT 'Task'
-// O arquivo agora sabe o que é uma "Task"
 type Task struct {
 	ID        int    `json:"id"`
 	Titulo    string `json:"titulo"`
@@ -22,15 +18,14 @@ type Task struct {
 }
 
 type TaskStore struct {
-	mu sync.Mutex
-	// [!code --] tasks  map[int]TaskStore
-	tasks  map[int]Task // [!code ++] 2. CORRIGIDO: O mapa deve conter 'Task'
+	mu     sync.Mutex
+	tasks  map[int]Task
 	nextID int
 }
 
 func NewTaskStore() *TaskStore {
 	store := &TaskStore{
-		tasks:  make(map[int]Task), // Isso já estava certo
+		tasks:  make(map[int]Task),
 		nextID: 1,
 	}
 
@@ -67,7 +62,7 @@ func (ts *TaskStore) load() {
 }
 
 func (ts *TaskStore) save() {
-	data, err := json.MarshalIndent(ts.tasks, "", "  ") // Corrigido o espaçamento
+	data, err := json.MarshalIndent(ts.tasks, "", "  ")
 	if err != nil {
 		log.Printf("ERRO: Falha ao fazer marshal das tasks: %v\n", err)
 		return
@@ -122,8 +117,7 @@ func (ts *TaskStore) UpdateTask(id int, titulo string, descricao string, status 
 		return Task{}, false
 	}
 
-	// [!code --] updatedTask := TasksT{
-	updatedTask := Task{ // [!code ++] 3. CORRIGIDO: Erro de digitação 'TasksT'
+	updatedTask := Task{
 		ID:        id,
 		Titulo:    titulo,
 		Descricao: descricao,
