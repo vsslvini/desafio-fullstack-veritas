@@ -2,7 +2,8 @@
 
 <div align="center">
 
-[![Assista à demonstração](https://img.youtube.com/vi/ZcD8-lEaU-4/0.jpg)](https://youtu.be/ZcD8-lEaU-4)
+#### Demonstração em Vídeo
+[![Assista à demonstração](docs/Mini%20Kanban.png)](https://youtu.be/ZcD8-lEaU-4)
 
 </div>
 Este repositório contém a solução para o desafio técnico fullstack de um mini-quadro Kanban, utilizando **Go** no backend e **React com TypeScript** no frontend.
