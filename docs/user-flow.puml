@@ -1,0 +1,71 @@
+/'
+DICA CASO QUEIRA GERAR O DIAGRAMA
+Para rodar este diagrama, utilize a extensão PlantUML no VSCode ou acesse https://plantuml.com/pt/guide
+Após a instalação da extensão, utilize o atalho "Alt + D" para gerar o diagrama.
+'/
+@startuml user-flow
+
+title Fluxo de Usuário - App Kanban
+
+start
+
+:Usuário abre o App;
+
+while (Carregando tarefas?)
+    if (API OK?) then (Sim)
+        break
+        else (Não)
+            :Exibe Mensagem de Erro;
+        endif
+    endwhile
+
+    :Visualiza Board com 3 Colunas;
+
+    fork
+        partition "Ação: Adicionar" {
+            :Clica em + Adicionar Tarefa;
+            :Abre Modal;
+            :Preenche Título;
+            :Clica Salvar;
+            :Envia POST /tasks;
+            :Tarefa aparece em A Fazer;
+            :Modal fecha;
+        }
+    fork again
+        partition "Ação: Editar/Excluir" {
+            :Clica em um Card existente;
+            while (Modal aberto?)
+                :Abre Modal;
+                if (Usuário deseja Editar?) then (Editar)
+                    :Altera Título/Descrição;
+                    :Clica Atualizar;
+                    :Envia PUT /tasks/:id;
+                    :Card é atualizado;
+                    :Modal fecha;
+                    break
+                    else (Excluir)
+                        :Clica Excluir;
+                        if (Confirma?) then (Sim)
+                            :Envia DELETE /tasks/:id;
+                            :Card desaparece;
+                            :Modal fecha;
+                            break
+                            else (Não)
+                                :Volta ao Modal;
+                            endif
+                            endif
+                        endwhile
+                    }
+                fork again
+                    partition "Ação: Mover Tarefa (DND)" {
+                        :Clica e Arrasta um Card;
+                        :Solta em outra coluna;
+                        :UI atualiza status;
+                        :Envia PUT /tasks/:id com novo status;
+                        :Backend confirma;
+                    }
+                end fork
+
+                stop
+
+                @enduml
